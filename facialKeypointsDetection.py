@@ -22,7 +22,7 @@ def load(test=False, cols=None):
         df.shape
         df.columns
         df.head(1)
-        #imageというカラムに画像データが入っていて、ほかのカラムには鼻の位置などが入っている
+        #imageというカラムに画像データが入っていて、ほかのカラムには鼻の位置などがx,y座標にわけて入っている
         type(df['Image'][0])
 
     # スペースで句切られているピクセル値をnumpy arrayに変換
@@ -142,3 +142,15 @@ hist2 = model2.fit(X, y, nb_epoch=10, validation_split=0.2)
 
 from keras.utils.visualize_util import plot
 plot(model2, to_file='model2.png', show_shapes=True)
+
+sample1 = load(test=True)[0][6:7]
+sample2 = load2d(test=True)[0][6:7]
+y_pred1 = model.predict(sample1)[0]
+y_pred2 = model2.predict(sample2)[0]
+
+fig = pyplot.figure(figsize=(6, 3))
+ax = fig.add_subplot(1, 2, 1, xticks=[], yticks=[])
+plot_sample(sample1, y_pred1, ax)
+ax = fig.add_subplot(1, 2, 2, xticks=[], yticks=[])
+plot_sample(sample2, y_pred2, ax)
+pyplot.show()
