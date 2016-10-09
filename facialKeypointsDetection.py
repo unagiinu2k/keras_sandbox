@@ -143,7 +143,8 @@ model2.add(Dense(30))
 sgd = SGD(lr='0.01', momentum=0.9, nesterov=True)
 model2.compile(loss='mean_squared_error', optimizer=sgd)
 hist2 = model2.fit(X, y, nb_epoch=10, validation_split=0.2)
-
+import pydot_ng
+import graphviz
 from keras.utils.visualize_util import plot
 plot(model2, to_file='model2.png', show_shapes=True)
 
