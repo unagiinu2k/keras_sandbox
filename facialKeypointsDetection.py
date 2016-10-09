@@ -2,6 +2,7 @@
 #http://danielnouri.org/notes/2014/12/17/using-convolutional-neural-nets-to-detect-facial-keypoints-tutorial/
 import os
 
+
 import numpy as np
 from pandas.io.parsers import read_csv
 from sklearn.utils import shuffle
@@ -71,7 +72,7 @@ model.add(Dense(30))
 
 sgd = SGD(lr='0.01', momentum=0.9, nesterov=True)
 model.compile(loss='mean_squared_error', optimizer=sgd)
-hist = model.fit(X, y, nb_epoch=10, validation_split=0.2)#20%のデータはvalidation用に使っている
+hist = model.fit(X, y, nb_epoch=100, validation_split=0.2)#20%のデータはvalidation用に使っている
 
 from matplotlib import pyplot
 pyplot.plot(hist.history['loss'], linewidth=3, label='train')
@@ -113,6 +114,9 @@ def load2d(test=False, cols=None):
 
 
 from keras.layers import Convolution2D, MaxPooling2D, Flatten
+from keras import backend as K
+K.set_image_dim_ordering('th')
+
 
 X, y = load2d()
 model2 = Sequential()
