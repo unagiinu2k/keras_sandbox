@@ -2,7 +2,8 @@
 #https://elix-tech.github.io/ja/2016/06/22/transfer-learning-ja.html
 #https://blog.keras.io/how-convolutional-neural-networks-see-the-world.html
 from __future__ import print_function
-from scipy.misc import imsave
+import scipy
+#from scipy.misc import imsave
 import numpy as np
 import time
 import os
@@ -52,6 +53,9 @@ if False:
 layer_names = [n.decode('utf8') for n in f.attrs['layer_names']]
 weight_value_tuples = []
 #各レイヤーに転送すべきウェイト情報を取り出している
+#通常はmodel.load_weights()を使うだけで簡単に読み込めるのですが、ここでは使用することはできません。
+# 学習時には全結合層も存在していたのですが、このモデルでは全結合層が存在しないためエラーが起きてしまいます。
+# そこで、層ごとに読み込んで行き、全結合層の手前まできたら終了させます。
 for k, name in enumerate(layer_names):#enumerateを使うことで　for x in yタイプのループで何番目の要素なのかもavailableになる
     if False:
         k = 0
@@ -106,6 +110,15 @@ def deprocess_image(x):
     x = np.clip(x, 0, 255).astype('uint8')
     return x
 
+
+
+#次に、フィルタによる活性化が最大となる入力画像について考えます。どのようにしてそのような入力画像を作ることができるでしょうか。
+# これは一つの最適化問題であると考えることができます。フィルタによる活性化が最大になるようにしたいので、
+# 単純にはいつものように勾配降下法（gradient descent）を使えば良いことになります（正確には最小化ではなく最大化なのでgradient ascent）。
+
+#まず、ある層（layer_name）のあるフィルタ（filter_index）による活性化を表す損失関数（loss）を定義します。
+# （公式ブログに合わせてlossにしていますが、最大値を考えるのでscoreのような名前の方が分かりやすいかもしれません。）
+
 kept_filters = []
 for filter_index in range(0, 128):
     print('Processing filter %d' % filter_index)
@@ -153,4 +166,4 @@ for i in range(nb_img_x):
         stitched_filters[(img_height + margin) * j: (img_height + margin) * j + img_height,
             (img_width + margin) * i: (img_width + margin) * i + img_width, :] = img
 
-imsave('stitched_filters_%s_%dx%d.png' % (layer_name, nb_img_x, nb_img_y), stitched_filters)
+scipy.misc.imsave('stitched_filters_%s_%dx%d.png' % (layer_name, nb_img_x, nb_img_y), stitched_filters)
