@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 #https://elix-tech.github.io/ja/2016/06/22/transfer-learning-ja.html
+#https://blog.keras.io/how-convolutional-neural-networks-see-the-world.html
 from __future__ import print_function
 from scipy.misc import imsave
 import numpy as np
@@ -50,6 +51,7 @@ if False:
 
 layer_names = [n.decode('utf8') for n in f.attrs['layer_names']]
 weight_value_tuples = []
+#各レイヤーに転送すべきウェイト情報を取り出している
 for k, name in enumerate(layer_names):#enumerateを使うことで　for x in yタイプのループで何番目の要素なのかもavailableになる
     if False:
         k = 0
@@ -59,8 +61,11 @@ for k, name in enumerate(layer_names):#enumerateを使うことで　for x in y�
     g = f[name]#特定のレイヤーをとってきている
     if False:
         print(name)
-        print(g.attrs['weight_names'])#そのレイヤーをspecifyするのに必要なdataの名前。例えばWとbといったかんじ
+        type(g.attrs)
+        print(g.attrs['weight_names'])#そのレイヤーをspecifyするのに必要なウェイト変数の名前。例えばWとbといったかんじ
         weight_names
+        [x for x in g.attrs]
+        g[weight_names[0]]
     weight_names = [n.decode('utf8') for n in g.attrs['weight_names']]
     if len(weight_names):
         weight_values = [g[weight_name] for weight_name in weight_names]
