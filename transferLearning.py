@@ -1,169 +1,143 @@
 # -*- encoding: utf-8 -*-
-#https://elix-tech.github.io/ja/2016/06/22/transfer-learning-ja.html
-#https://blog.keras.io/how-convolutional-neural-networks-see-the-world.html
-from __future__ import print_function
-import scipy
-#from scipy.misc import imsave
-import numpy as np
-import time
 import os
 import h5py
-
+import numpy as np
+from pandas.io.parsers import read_csv
+from sklearn.cross_validation import train_test_split
+from collections import OrderedDict
 from keras.models import Sequential
-from keras.layers import Convolution2D, Activation, MaxPooling2D, Dropout
+from keras.layers import Convolution2D, Activation, MaxPooling2D , Dropout
 from keras import backend as K
+from sklearn.utils import shuffle
 
+from matplotlib import pyplot
+
+# ダウンロード：https://www.kaggle.com/c/facial-keypoints-detection/data
+FTRAIN = 'data/training.csv'
+FTEST = 'data/test.csv'
+
+# ダウンロード：https://github.com/elix-tech/kaggle-facial-keypoints
+weights_path = 'data/model6_weights_5000.h5'
 img_width = 96
 img_height = 96
-weights_path = 'data/model6_weights_5000.h5'
-layer_name = 'conv3'
 
+def load(test=False, cols=None):
+    fname = FTEST if test else FTRAIN
+    df = read_csv(os.path.expanduser(fname))
 
-model = Sequential()
+    df['Image'] = df['Image'].apply(lambda im: np.fromstring(im, sep=' '))
 
-model.add(Convolution2D(32, 3, 3, input_shape=(1, 96, 96), name='conv1'))
-first_layer = model.layers[-1]
-input_img = first_layer.input
+    if cols:
+        df = df[list(cols) + ['Image']]
 
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.1))
+    print(df.count())
+    df = df.dropna()
 
-model.add(Convolution2D(64, 2, 2, name='conv2'))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.2))
+    X = np.vstack(df['Image'].values) / 255.
+    X = X.astype(np.float32)
 
-model.add(Convolution2D(128, 2, 2, name='conv3'))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.3))
+    if not test:
+        y = df[df.columns[:-1]].values
+        y = (y - 48) / 48
+        X, y = shuffle(X, y, random_state=42)
+        y = y.astype(np.float32)
+    else:
+        y = None
 
+    return X, y
 
-assert os.path.exists(weights_path), 'Model weights not found (see "weights_path" variable in script).'
-f = h5py.File(weights_path)
+def load2d(test=False, cols=None):
+    X, y = load(test, cols)
+    X = X.reshape(-1, 1, 96, 96)
+    return X, y
 
-if False:
-    type(f)
-    type(f.attrs)
-    type(layer_names)
-    tmp = (enumerate(layer_names))
-    tmp[1]
+def flip_image(X, y):
+    flip_indices = [
+        (0, 2), (1, 3),
+        (4, 8), (5, 9), (6, 10), (7, 11),
+        (12, 16), (13, 17), (14, 18), (15, 19),
+        (22, 24), (23, 25),
+        ]
 
-layer_names = [n.decode('utf8') for n in f.attrs['layer_names']]
-weight_value_tuples = []
-#各レイヤーに転送すべきウェイト情報を取り出している
-#通常はmodel.load_weights()を使うだけで簡単に読み込めるのですが、ここでは使用することはできません。
-# 学習時には全結合層も存在していたのですが、このモデルでは全結合層が存在しないためエラーが起きてしまいます。
-# そこで、層ごとに読み込んで行き、全結合層の手前まできたら終了させます。
-for k, name in enumerate(layer_names):#enumerateを使うことで　for x in yタイプのループで何番目の要素なのかもavailableになる
-    if False:
-        k = 0
-        name = layer_names[0]
-    if k >= len(model.layers):
-        break
-    g = f[name]#特定のレイヤーをとってきている
-    if False:
-        print(name)
-        type(g.attrs)
-        print(g.attrs['weight_names'])#そのレイヤーをspecifyするのに必要なウェイト変数の名前。例えばWとbといったかんじ
-        weight_names
-        [x for x in g.attrs]
-        g[weight_names[0]]
-    weight_names = [n.decode('utf8') for n in g.attrs['weight_names']]
-    if len(weight_names):
-        weight_values = [g[weight_name] for weight_name in weight_names]
-        layer = model.layers[k]
-        symbolic_weights = layer.trainable_weights + layer.non_trainable_weights
-        if len(weight_values) != len(symbolic_weights):
-            raise Exception('Layer #' + str(k) +
-                            ' (named "' + layer.name +
-                            '" in the current model) was found to '
-                            'correspond to layer ' + name +
-                            ' in the save file. '
-                            'However the new layer ' + layer.name +
-                            ' expects ' + str(len(symbolic_weights)) +
-                            ' weights, but the saved weights have ' +
-                            str(len(weight_values)) +
-                            ' elements.')
-        weight_value_tuples += zip(symbolic_weights, weight_values)
-K.batch_set_value(weight_value_tuples)
-f.close()
+    X_flipped = np.array(X[:, :, :, ::-1])
+    y_flipped = np.array(y)
+    y_flipped[:, ::2] = y_flipped[:, ::2] * -1
 
-print('Model loaded.')
+    for i in range(len(y)):
+        for a, b in flip_indices:
+            y_flipped[i, a], y_flipped[i, b] = (y_flipped[i, b], y_flipped[i, a])
+    return X_flipped, y_flipped
 
-layer_dict = dict([(layer.name, layer) for layer in model.layers])
+def save_bottleneck_features():
+    model = Sequential()
+    model.add(Convolution2D(32, 3, 3, input_shape=(1, img_width, img_height)))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.1))
 
-def normalize(x):
-    return x / (K.sqrt(K.mean(K.square(x))) + 1e-5)
+    model.add(Convolution2D(64, 2, 2))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.2))
 
-def deprocess_image(x):
-    x -= x.mean()
-    x /= (x.std() + 1e-5)
-    x *= 0.1
+    model.add(Convolution2D(128, 2, 2))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.3))
 
-    x += 0.5
-    x = np.clip(x, 0, 1)
-
-    x *= 255
-    x = x.transpose((1, 2, 0))
-    x = np.clip(x, 0, 255).astype('uint8')
-    return x
-
-
-
-#次に、フィルタによる活性化が最大となる入力画像について考えます。どのようにしてそのような入力画像を作ることができるでしょうか。
-# これは一つの最適化問題であると考えることができます。フィルタによる活性化が最大になるようにしたいので、
-# 単純にはいつものように勾配降下法（gradient descent）を使えば良いことになります（正確には最小化ではなく最大化なのでgradient ascent）。
-
-#まず、ある層（layer_name）のあるフィルタ（filter_index）による活性化を表す損失関数（loss）を定義します。
-# （公式ブログに合わせてlossにしていますが、最大値を考えるのでscoreのような名前の方が分かりやすいかもしれません。）
-
-kept_filters = []
-for filter_index in range(0, 128):
-    print('Processing filter %d' % filter_index)
-    start_time = time.time()
-
-    layer_output = layer_dict[layer_name].output
-    loss = K.mean(layer_output[:, filter_index, :, :])
-    grads = K.gradients(loss, input_img)[0]
-    grads = normalize(grads)
-    iterate = K.function([input_img, K.learning_phase()], [loss, grads])
-
-    step = 5.
-
-    input_img_data = np.random.random((1, 1, img_width, img_height)) * 20 + 128.
-
-    for i in range(200):
-        loss_value, grads_value = iterate([input_img_data, 0])
-        input_img_data += grads_value * step
-
-        print('Current loss value:', loss_value)
-        if loss_value <= 0.:
+    assert os.path.exists(weights_path), 'Model weights not found (see "weights_path" variable in script).'
+    f = h5py.File(weights_path)
+    layer_names = [n.decode('utf8') for n in f.attrs['layer_names']]
+    weight_value_tuples = []
+    for k, name in enumerate(layer_names):
+        if k >= len(model.layers):
+            # 全結合層の重みは読み込まない
             break
+        g = f[name]
+        weight_names = [n.decode('utf8') for n in g.attrs['weight_names']]
+        if len(weight_names):
+            weight_values = [g[weight_name] for weight_name in weight_names]
+            layer = model.layers[k]
+            symbolic_weights = layer.trainable_weights + layer.non_trainable_weights
+            if len(weight_values) != len(symbolic_weights):
+                raise Exception('Layer #' + str(k) +
+                                ' (named "' + layer.name +
+                                '" in the current model) was found to '
+                                'correspond to layer ' + name +
+                                ' in the save file. '
+                                'However the new layer ' + layer.name +
+                                ' expects ' + str(len(symbolic_weights)) +
+                                ' weights, but the saved weights have ' +
+                                str(len(weight_values)) +
+                                ' elements.')
+            weight_value_tuples += zip(symbolic_weights, weight_values)
+    K.batch_set_value(weight_value_tuples)
+    f.close()
+    print('Model loaded.')
 
-    if loss_value > 0:
-        img = deprocess_image(input_img_data[0])
-        kept_filters.append((img, loss_value))
-    end_time = time.time()
-    print('Filter %d processed in %ds' % (filter_index, end_time - start_time))
+    X, y = load2d()
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
 
+    # 水平反転させた画像を事前に作成しておく
+    X_flipped, y_flipped = flip_image(X_train, y_train)
+    if False:
+        type(y[0])
+        y[0].shape
+        type(X[0])
+        X[0].shape
 
-nb_img_x = 6
-nb_img_y = 2
+        pyplot.imshow(X_train[0][0] , cmap = 'gray')
+        pyplot.imshow(X_flipped[0][0] , cmap = 'gray')
 
-kept_filters.sort(key=lambda x: x[1], reverse=True)
-kept_filters = kept_filters[:nb_img_x * nb_img_y]
+    X_train = np.vstack((X_train, X_flipped)) #verticalに結合　rbindみたいなもんか
+    y_train = np.vstack((y_train, y_flipped))
 
-margin = 5
-width = nb_img_x * img_width + (nb_img_x - 1) * margin
-height = nb_img_y * img_height + (nb_img_y - 1) * margin
-stitched_filters = np.zeros((height, width, 3))
+    bottleneck_features_train = model.predict(X_train)
+    np.save(open('bottleneck_features_train.npy', 'w'), bottleneck_features_train)
+    np.save(open('label_train.npy', 'w'), y_train)
 
-for i in range(nb_img_x):
-    for j in range(nb_img_y):
-        img, loss = kept_filters[j * nb_img_y + i]
-        stitched_filters[(img_height + margin) * j: (img_height + margin) * j + img_height,
-            (img_width + margin) * i: (img_width + margin) * i + img_width, :] = img
+    bottleneck_features_validation = model.predict(X_val)
+    np.save(open('bottleneck_features_validation.npy', 'w'), bottleneck_features_validation)
+    np.save(open('label_validation.npy', 'w'), y_val)
 
-scipy.misc.imsave('stitched_filters_%s_%dx%d.png' % (layer_name, nb_img_x, nb_img_y), stitched_filters)
+save_bottleneck_features()
