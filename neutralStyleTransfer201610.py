@@ -34,6 +34,7 @@ keeping the generated image close enough to the original one.
 
 from __future__ import print_function
 from keras.preprocessing.image import load_img, img_to_array
+import scipy
 from scipy.misc import imsave
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
