@@ -250,6 +250,8 @@ else:
 for i in range(10):
     print('Start of iteration', i)
     start_time = time.time()
+    #L-BFGSは準ニュートン法の一種
+    #https://en.wikipedia.org/wiki/Limited-memory_BFGS
     x, min_val, info = fmin_l_bfgs_b(evaluator.loss, x.flatten(),
                                      fprime=evaluator.grads, maxfun=20)
     print('Current loss value:', min_val)
