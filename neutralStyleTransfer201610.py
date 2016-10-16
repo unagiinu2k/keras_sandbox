@@ -42,6 +42,7 @@ import argparse
 #https://groups.google.com/forum/#!topic/keras-users/3OpfQHzCk64
 from keras.applications import vgg16
 from keras import backend as K
+import os
 if False:
 
     parser = argparse.ArgumentParser(description='Neural style transfer with Keras.')
@@ -58,18 +59,20 @@ if False:
     result_prefix = args.result_prefix
 else:
 
-    base_image_path = r"base_graphics"
+    #base_image_path = r"base_graphics"
     #base_image_path = r"c:\Users\t\git\keras\base_graphics\car.jpg"
-    base_image_path = r"c:\Users\t\git\keras\base_graphics\cat.png"
-#    style_reference_image_path = r"style_refs\009.jpg"
-    style_reference_image_path = r"style_refs\style_0.png"
+    #base_image_path = r"c:\Users\t\git\keras\base_graphics\cat.png"
+    base_image_path = os.path.join("data", "cat.png")
+    #    style_reference_image_path = r"style_refs\009.jpg"
+    #style_reference_image_path = r"style_refs\style_0.png"
+    style_reference_image_path = os.path.join("style_refs" , "style_0.png")
     result_prefix = "tmp"
 # these are the weights of the different loss components
 total_variation_weight = 1.
 style_weight = 1.
 content_weight = 0.025
 
-# dimensions of the generated picture.
+# dimensions of the generated picture.,
 img_nrows = 400
 img_ncols = 400
 assert img_ncols == img_nrows, 'Due to the use of the Gram matrix, width and height must match.'
