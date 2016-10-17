@@ -252,9 +252,24 @@ for i in range(10):
     print('Start of iteration', i)
     start_time = time.time()
     #L-BFGSは準ニュートン法の一種
+    #fmin_l_bfgs_bは準ニュートン法のワンステップを最大maxfun回繰り返す。maxfunのデフォルトは15000なので大体最小点まで求まる。
+    #ここではmaxfun=20なので20ステップごとに途中経過を描画しているイメージ
     #https://en.wikipedia.org/wiki/Limited-memory_BFGS
     x, min_val, info = fmin_l_bfgs_b(evaluator.loss, x.flatten(),
                                      fprime=evaluator.grads, maxfun=20)
+    #上式の右辺第二項のflatten()は実際には最初の一回以外はいらないが、あっても害悪は及ぼさない
+
+    if False:
+        def tmp3(x):
+            return (x[0]-5)**2 + (x[0]-3)**3
+        from scipy.optimize import fmin_l_bfgs_b
+        import numpy as np
+        #http://stackoverflow.com/questions/36901/what-does-double-star-and-star-do-for-python-parameters
+        #http://stackoverflow.com/questions/11963067/python-scipy-invalid-index-to-scalar-variable
+        tmpx = np.array([16])
+        tmpx,f,d = fmin_l_bfgs_b(tmp3 , tmpx , approx_grad=True , maxfun = 1)
+        print(tmpx)
+
     print('Current loss value:', min_val)
     # save current generated image
     img = deprocess_image(x.copy())
