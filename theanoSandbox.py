@@ -1,5 +1,7 @@
 #http://deeplearning.net/software/theano/library/tensor/basic.html
 #http://sinhrks.hatenablog.com/entry/2014/11/26/002818
+
+#日本語解説はhttp://aidiary.hatenablog.com/entry/20150509/1431137590
 import theano.tensor as T
 x = T.fmatrix()
 x.shape
@@ -19,6 +21,7 @@ f(2,3)
 numpy.allclose(f(2,3),5)
 z.eval({x : 2 , y : 3})
 if False:
+    type(x.eval({x:1}))
     tmp = {x : 2 , y : 3}
     type(tmp)
     tmp[x]
@@ -36,8 +39,10 @@ r = p + 2 * q
 tmp = function([p , q] , r)
 tmp(1,2)
 r.eval({p:1 , q :1})
-
+theano.printing.debugprint(z)
 x = T.dmatrix()
 s = 1 / (1 + T.exp(-x))# expはcomponentwise
 s.eval({x:[[1]]})
 s.eval({x:[[1 , 2] , [3,4]]})
+import theano
+theano.printing.debugprint(s)
