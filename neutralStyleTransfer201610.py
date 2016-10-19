@@ -105,10 +105,18 @@ def deprocess_image(x):
 # get tensor representations of our images
 base_image = K.variable(preprocess_image(base_image_path))
 style_reference_image = K.variable(preprocess_image(style_reference_image_path))
-
+if False:
+    type(base_image) #sharedvarなのでこれにはバリューがアサインされている
+    print(base_image.get_value())#valueはこのようにして取り出せる
 # this will contain our generated image
 if K.image_dim_ordering() == 'th':
     combination_image = K.placeholder((1, 3, img_nrows, img_ncols))
+    #theanoベースの場合、theao.tensor.var.TensorVariableというクラスを返す。TensorFlowとの互換性のためにこのような書式になっている
+    if False:
+        import theano
+        theano.printing.debugprint(combination_image)
+        #多分まだ単なるシンボルで数値はアサインされていない
+
 else:
     combination_image = K.placeholder((1, img_nrows, img_ncols, 3))
 
