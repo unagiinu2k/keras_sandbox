@@ -138,7 +138,7 @@ outputs_dict = dict([(layer.name, layer.output) for layer in model.layers])
 # first we need to define 4 util functions
 
 # the gram matrix of an image tensor (feature-wise outer product)
-def gram_matrix(x):
+def gram_matrix(x):#転置行列×元の行列をグラム行列と呼ぶらしい
     assert K.ndim(x) == 3
     if K.image_dim_ordering() == 'th':
         features = K.batch_flatten(x)
@@ -185,12 +185,13 @@ layer_features = outputs_dict['block4_conv2']
 base_image_features = layer_features[0, :, :, :]
 combination_features = layer_features[2, :, :, :]
 loss += content_weight * content_loss(base_image_features,
-                                      combination_features)
+                                      combination_features)#この段階では数値は入っていない代数(?)
+#コンテントロスは特定の中間層（block4_conv2）の出力のコンテンツ画像（猫）の当該レイヤー出力との誤差
 
 feature_layers = ['block1_conv1', 'block2_conv1',
                   'block3_conv1', 'block4_conv1',
                   'block5_conv1']
-for layer_name in feature_layers:
+for layer_name in feature_layers:#上記の５つのレイヤー（たぶんすべての畳み込み層）についてのスタイルエラーを加算
     layer_features = outputs_dict[layer_name]
     style_reference_features = layer_features[1, :, :, :]
     combination_features = layer_features[2, :, :, :]
@@ -199,7 +200,7 @@ for layer_name in feature_layers:
 loss += total_variation_weight * total_variation_loss(combination_image)
 
 # get the gradients of the generated image wrt the loss
-grads = K.gradients(loss, combination_image)
+grads = K.gradients(loss, combination_image)#英語説明はなんか変では？これはおそらくlossを生成された画像で微分したもの
 
 outputs = [loss]
 if type(grads) in {list, tuple}:
