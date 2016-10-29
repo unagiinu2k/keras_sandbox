@@ -40,7 +40,7 @@ def load(test=False, cols=None):
 
     if not test:  # ラベルが存在するのはFTRAINのみ
         y = df[df.columns[:-1]].values
-        y = (y - 48) / 48  # -1から1の値に変換
+        y = (y - 48) / 48  # -1から1の値に変換h
         X, y = shuffle(X, y, random_state=42)  # データをシャッフル
         y = y.astype(np.float32)
     else:
