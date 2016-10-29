@@ -261,6 +261,8 @@ for i in range(10):
     print('Start of iteration', i)
     start_time = time.time()
     #L-BFGSは準ニュートン法の一種
+    #https://elix-tech.github.io/ja/2016/08/22/art.html
+    #の解説もためになる
     #fmin_l_bfgs_bは準ニュートン法のワンステップを最大maxfun回繰り返す。maxfunのデフォルトは15000なので大体最小点まで求まる。
     #ここではmaxfun=20なので20ステップごとに途中経過を描画しているイメージ
     #https://en.wikipedia.org/wiki/Limited-memory_BFGS
