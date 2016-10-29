@@ -63,11 +63,17 @@ else:
     #base_image_path = r"base_graphics"
     #base_image_path = r"c:\Users\t\git\keras\base_graphics\car.jpg"
     #base_image_path = r"c:\Users\t\git\keras\base_graphics\cat.png"
-    base_image_path = os.path.join("data", "cat.png")
+    base_image_name = "cat"
+    style_image_name = "style_0"
+    #base_image_path = os.path.join("data", "cat.png")
+
+    base_image_path = os.path.join("data", base_image_name +".png")
     #    style_reference_image_path = r"style_refs\009.jpg"
     #style_reference_image_path = r"style_refs\style_0.png"
-    style_reference_image_path = os.path.join("style_refs" , "style_0.png")
-    result_prefix = "tmp"
+    style_reference_image_path = os.path.join("style_refs" , style_image_name + ".png")
+    result_prefix = os.path.join('results' , base_image_name +  '_' + style_image_name)
+    if not os.path.isdir('results'):
+        os.mkdir('results')
 # these are the weights of the different loss components
 total_variation_weight = 1.
 style_weight = 1.
