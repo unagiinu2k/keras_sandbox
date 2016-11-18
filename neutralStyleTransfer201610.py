@@ -60,10 +60,11 @@ if False:
     result_prefix = args.result_prefix
 else:
 
-    #base_image_name = "cat"
-    base_image_name = "doraemon"
+    base_image_name = "cat"
+    #base_image_name = "doraemon"
 
-    style_image_name = "nara"
+    # style_image_name = "nara"
+    style_image_name = "aida"
 
     #base_image_path = os.path.join("data", "cat.png")
 
@@ -77,7 +78,7 @@ else:
 # these are the weights of the different loss components
 total_variation_weight = 1.
 style_weight = 1.
-content_weight = 0.025
+content_weight = 0.1
 
 # dimensions of the generated picture.,
 img_nrows = 400
