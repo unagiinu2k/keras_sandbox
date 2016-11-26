@@ -54,3 +54,12 @@ from theano import pp#pretty print
 pp(s)
 
 f2 = T.function()
+
+from theano import shared
+
+state = shared(1 , name='state')
+inc = T.iscalar('inc')
+state.get_value()
+
+accumulator = function(inputs = [inc] , outputs = [state] , updates=[(state  , state + inc)])#update happens after output evaluation
+accumulator(109)

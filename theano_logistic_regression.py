@@ -28,8 +28,10 @@ print("Initial model:")
 print(w.get_value())
 print(b.get_value())
 
+
 # Construct Theano expression graph
 p_1 = 1 / (1 + T.exp(-T.dot(x, w) - b))   # Probability that target = 1
+
 prediction = p_1 > 0.5                    # The prediction thresholded
 xent = -y * T.log(p_1) - (1-y) * T.log(1-p_1) # Cross-entropy loss function
 cost = xent.mean() + 0.01 * (w ** 2).sum()# The cost to minimize
@@ -38,6 +40,25 @@ gw, gb = T.grad(cost, [w, b])             # Compute the gradient of the cost
                                           # bias term b
                                           # (we shall return to this in a
                                           # following section of this tutorial)
+
+
+if False:
+    theano.pp(p_1)
+    theano.pp(prediction)
+    theano.pp(gw)
+    theano.pp(gb)
+    x = theano.tensor.dscalar('x')
+    a = theano.shared(1.0 , name='a')
+    y = a + x**2 + x
+    f = theano.function([x] , [y])
+    y_a = theano.tensor.grad(y , a)
+    y_x = theano.tensor.grad(y , x)
+    theano.pp(y_x)
+    theano.pp(y_a)
+    f_x = theano.function([x]  , [y_x , y_a])
+
+    f_x(3)
+
 
 # Compile
 train = theano.function(
