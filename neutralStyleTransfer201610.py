@@ -60,15 +60,16 @@ if False:
     result_prefix = args.result_prefix
 else:
 
-    #base_image_path = r"base_graphics"
-    #base_image_path = r"c:\Users\t\git\keras\base_graphics\car.jpg"
-    #base_image_path = r"c:\Users\t\git\keras\base_graphics\cat.png"
     base_image_name = "cat"
-    style_image_name = "style_0"
+    #base_image_name = "doraemon"
+
+    # style_image_name = "nara"
+    style_image_name = "aida"
+
     #base_image_path = os.path.join("data", "cat.png")
 
     base_image_path = os.path.join("data", base_image_name +".png")
-    #    style_reference_image_path = r"style_refs\009.jpg"
+
     #style_reference_image_path = r"style_refs\style_0.png"
     style_reference_image_path = os.path.join("style_refs" , style_image_name + ".png")
     result_prefix = os.path.join('results' , base_image_name +  '_' + style_image_name)
@@ -77,7 +78,7 @@ else:
 # these are the weights of the different loss components
 total_variation_weight = 1.
 style_weight = 1.
-content_weight = 0.025
+content_weight = 0.1
 
 # dimensions of the generated picture.,
 img_nrows = 400
@@ -290,7 +291,8 @@ for i in range(10):
     print('Current loss value:', min_val)
     # save current generated image
     img = deprocess_image(x.copy())
-    fname = result_prefix + '_at_iteration_%d.png' % i
+    fname = result_prefix + '_' + str(total_variation_weight) + '_' + str(style_weight) + '_' + str(content_weight) + '_at_iteration_%d.png' % i
+
     imsave(fname, img)
     end_time = time.time()
     print('Image saved as', fname)
