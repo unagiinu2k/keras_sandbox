@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+#https://elix-tech.github.io/ja/2016/06/22/transfer-learning-ja.html
 import os
 import h5py
 import numpy as np

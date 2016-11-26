@@ -16,10 +16,10 @@ from theano import function
 x = T.dscalar('x')
 y = T.dscalar('y')
 z = x+ y
-f = function([x,y],z)
-f(2,3)
+f = function([x,y],z) #more flexible function definition, maybe preferrable consequnently
+f(2,3) # function defined as f eats x,y,z,...
 numpy.allclose(f(2,3),5)
-z.eval({x : 2 , y : 3})
+z.eval({x : 2 , y : 3}) #z eats a dict type input through eval
 if False:
     type(x.eval({x:1}))
     tmp = {x : 2 , y : 3}
@@ -39,10 +39,18 @@ r = p + 2 * q
 tmp = function([p , q] , r)
 tmp(1,2)
 r.eval({p:1 , q :1})
-theano.printing.debugprint(z)
+T.printing.debugprint(z)
+s = T.dscalar('s0')
+t = r + s
+u = function([p , q , s]  , [r , t])
+u(1,2,3)
+T.printing.debugprint(s)
 x = T.dmatrix()
 s = 1 / (1 + T.exp(-x))# expはcomponentwise
 s.eval({x:[[1]]})
 s.eval({x:[[1 , 2] , [3,4]]})
-import theano
-theano.printing.debugprint(s)
+T.printing.debugprint(s)
+from theano import pp#pretty print
+pp(s)
+
+f2 = T.function()
