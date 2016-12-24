@@ -10,12 +10,53 @@ environment.set('musicxmlPath' , r"C:\Program Files (x86)\Finale NotePad 2012\Fi
 s = corpus.parse('bach/bwv65.2.xml')
 s.analyze('key')
 s.show('midi')
-
-converter.parse("tinynotation: 3/4 c4 d8 f g16 a g f#").show()
-s = converter.parse('/home/naraba/program/python/music21/etude10-05.xml')
+type(s)
+s_parts = [x for x in s.parts]
+len(s_parts)
+s_parts[0].show('midi')
 s.show()
 
-f =note.Note("F5")
+p = converter.parse("tinynotation: 3/4 c4 d8 f g16 a g f#")
+q = converter.parse("tinynotation: 4/4 c4 DD4 e''4 f1# g8b h4")
+type(converter.parse("tinynotation: 4/4 c4 DD4 e''4 f1# g8b h4"))
+type(p)
+#s = converter.parse('/home/naraba/program/python/music21/etude10-05.xml')
+
+stream.Stream.mro()
+stream.Part.mro()
+s2 = stream.Stream()
+s2.insert(0  , p)#adding part, first argument should be offset??
+s2.insert(320  , q)
+s2.show()
+s2.show('midi')
+s2_parts = [x for x in s2.parts]#error
+
+#standard hierarchy
+#http://web.mit.edu/music21/doc/usersGuide/usersGuide_06_stream2.html
+score0 = stream.Score()
+part0 = stream.Part()
+part0.append([note.Note('F5') , note.Note('F6')])
+part0.show('midi')
+part0.measures(0,1).show() #measure = 小節　 specify semi-open period
+score0.insert(0,part0)
+part1 = stream.Part()
+part1.append([note.Note('F5') , note.Note('F6')])
+
+score0.insert(320,part1)
+score0.show()
+len(score0.getElementsByClass(stream.Part))
+len(score0.getElementsByClass(note.Note)) # returns zero as expected
+run_score.insert(0 , p)
+run_score.insert(320 , q)
+type(p)
+run_score_parts = [x for x in run_score]#error
+len(run_score_parts)
+from music21 import chord
+c1 = chord.Chord(["C4" , "G4" , "G4"]) #和音
+chord.Chord.mro()
+c1.show('midi')
+c1.show()
+f5 = note.Note("F5")
 f.name
 f.octave
 f.pitch.frequency
