@@ -363,6 +363,9 @@ def unparse_grammar(m1_grammar, m1_chords):
             prevElement = insertNote
 
     return m1_elements
+
+
+
 #from preprocess import *
 
 '''
@@ -374,7 +377,7 @@ Code adapted from Evan Chow's jazzml, https://github.com/evancchow/jazzml with
 express permission.
 '''
 
-from __future__ import print_function
+#from __future__ import print_function
 
 from music21 import *
 from collections import defaultdict, OrderedDict
@@ -681,7 +684,7 @@ Keras documentation on GitHub:
 https://github.com/fchollet/keras/blob/master/examples/lstm_text_generation.py
 '''
 
-from __future__ import print_function
+#from __future__ import print_function
 
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation, Dropout

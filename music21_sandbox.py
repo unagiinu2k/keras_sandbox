@@ -13,6 +13,7 @@ s.analyze('key')
 s.show('midi')
 [type(x) for x in s.getElementsByClass(stream.Stream)] #a lot of "Part"s
 [[print(type(y)) for y in x.getElementsByClass(stream.Stream)] for x in s.getElementsByClass(stream.Stream)]
+[print(x) for x  in s.flat.getElementsByClass(note.Note)]#example of how to flatten the score
 #unlike the deepjazz example, each Parts consists of "Measure"s
 type(s)#score
 
@@ -202,3 +203,16 @@ stream.Voice
 
 m1 = stream1.getElementsByClass(stream.Voice)
 len(m1)
+
+
+#interval
+
+i = interval.Interval('P5')
+i
+i.name
+i.niceName
+i.isConsonant()#協和しているか
+i = interval.Interval('m3')
+i.niceName
+i.semitones
+interval.add([i , 'm3']).semitones
