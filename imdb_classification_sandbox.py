@@ -2,7 +2,7 @@
 from keras.preprocessing import sequence
 from keras.utils import np_utils
 from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Activation
+from keras.layers.core import Dense, Dropout, , Activation
 from keras.layers.embeddings import Embedding
 from keras.layers.recurrent import LSTM
 from keras.datasets import imdb
@@ -22,7 +22,7 @@ if False:
     print(X_train[0])#sequence of numbers (= corresponding to words in the vocab)
     max([len(x) for x in X_train])#2494
     max([len(x) for x in X_test])#2315
-    min([len(x) for x in X_train])#11
+min([len(x) for x in X_train])#11
     min([len(x) for x in X_test])#7
     numpy.mean([len(x) for x in X_train])#238.71364
     numpy.mean([len(x) for x in X_test])#230.80420
