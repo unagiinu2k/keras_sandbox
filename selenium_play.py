@@ -1,6 +1,18 @@
 from selenium import webdriver
 import chromedriver_binary
 import time
+
+
+def get_a_element(driver, xpath, caster):
+    items = driver.find_elements_by_xpath(xpath)
+    if len(items) > 0:
+        try:
+            return (caster(items[0].text))
+        except:
+            return (None)
+    return (None)
+
+
 driver = webdriver.Chrome()
 driver.get('https://play.google.com/store/apps')
 #driver.find_elements_by_link_text('カテゴリ')
@@ -10,6 +22,13 @@ category_dropdowns[0].click()
 L0_elements = category_dropdowns[0].find_elements_by_xpath("//descendant::a[@class = 'child-submenu-link']")
 L0_links = [x.get_attribute("href") for x in L0_elements]
 print('number of categories = {0}'.format(len(L0_links)))
+
+
+
+
+
+
+
 
 for i0 , s0 in enumerate(L0_elements):
     if False:
@@ -54,7 +73,16 @@ for i0 , s0 in enumerate(L0_elements):
                     date_updte = date_updates[0].text
                 except:
                     pass
+            def get_a_element(driver , xpath , caster):
+                items = driver.find_elements_by_xpath(xpath)
+                if len(items) > 0:
+                    try:
+                        return(caster(items[0].text))
+                    except:
+                        return(None)
+                return(None)
 
+            numDownloads = get_a_element(driver , "//div[@itemprop = 'numDownloads']" , lambda x:x)
             #get rating, maker name, maker url, review count etc.. for each product
 
 
