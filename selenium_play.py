@@ -50,40 +50,51 @@ for i0 , s0 in enumerate(L0_elements):
             else:
                 time.sleep(5)
                 show_mores[0].click()
-
-            scores = driver.find_elements_by_xpath("//div[@class = 'score']")
-            score = None
-            if len(scores) > 0:
-                try:
-                    score = float(scores[0].text)
-                except:
-                    pass
-
-            review_ns = driver.find_elements_by_xpath("//span[@class = 'reviews-num']")
-            review_n = None
-            if len(review_ns) > 0:
-                try:
-                    review_n = int(review_ns[0].text.replace(',',''))
-                except:
-                    pass
-            date_updates = driver.find_elements_by_xpath("//div[@itemprop = 'datePublished']")
-            date_update = None
-            if len(date_updates) > 0:
-                try:
-                    date_updte = date_updates[0].text
-                except:
-                    pass
-            def get_a_element(driver , xpath , caster):
-                items = driver.find_elements_by_xpath(xpath)
-                if len(items) > 0:
+            if False:
+                scores = driver.find_elements_by_xpath("//div[@class = 'score']")
+                score = None
+                if len(scores) > 0:
                     try:
-                        return(caster(items[0].text))
+                        score = float(scores[0].text)
                     except:
-                        return(None)
-                return(None)
+                        pass
 
-            numDownloads = get_a_element(driver , "//div[@itemprop = 'numDownloads']" , lambda x:x)
-            #get rating, maker name, maker url, review count etc.. for each product
+                review_ns = driver.find_elements_by_xpath("//span[@class = 'reviews-num']")
+                review_n = None
+                if len(review_ns) > 0:
+                    try:
+                        review_n = int(review_ns[0].text.replace(',',''))
+                    except:
+                        pass
+                date_updates = driver.find_elements_by_xpath("//div[@itemprop = 'datePublished']")
+                date_update = None
+                if len(date_updates) > 0:
+                    try:
+                        date_updte = date_updates[0].text
+                    except:
+                        pass
+                def get_a_element(driver , xpath , caster):
+                    items = driver.find_elements_by_xpath(xpath)
+                    if len(items) > 0:
+                        try:
+                            return(caster(items[0].text))
+                        except:
+                            return(None)
+                    return(None)
+
+
+            # get rating, maker name, maker url, review count etc.. for each product
+            score = get_a_element(driver, "//div[@class = 'score']" , lambda x:float(x))
+            reviews_num = get_a_element(driver , "//span[@class = 'reviews-num']" , lambda x:int(x.replace(',' , '')))
+            datePublished = get_a_element(driver, "//div[@itemprop = 'datePublished']" ,lambda x:x)
+            numDownloads = get_a_element(driver, "//div[@itemprop = 'numDownloads']", lambda x: x)
+            contentRating = get_a_element(driver, "//div[@itemprop = 'contentRating']", lambda x: x)
+            driver.find_elements_by_link_text('提供元')
+            meta_infos = driver.find_elements_by_xpath("//div[contains(@class , 'meta-info')]")
+
+            [x.text for x in meta_infos]
+
+
 
 
 
