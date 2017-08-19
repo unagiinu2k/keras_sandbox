@@ -32,6 +32,20 @@ for i0 , s0 in enumerate(L0_elements):
                 time.sleep(5)
                 show_mores[0].click()
 
+            scores = driver.find_elements_by_xpath("//div[@class = 'score']")
+            if len(scores) > 0:
+                try:
+                    score = float(scores[0].text)
+                except:
+                    score = None
+            review_ns = driver.find_elements_by_xpath("//span[@class = 'reviews-num']")
+
+            if len(review_ns) > 0:
+                try:
+                    review_n = int(review_ns[0].text.replace(',',''))
+                except:
+                    review_n = None
+
             #get rating, maker name, maker url, review count etc.. for each product
 
 
