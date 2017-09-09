@@ -21,6 +21,25 @@ driver.get('https://order.yodobashi.com/yc/orderhistory/index.html')
 drop_downs = driver.find_elements_by_id('selectedPeriod')
 driver.find_element_by_xpath("//select[@id='selectedPeriod']/option[text()='全てのご注文']").click()
 driver.find_elements_by_link_text('検索')[1].click()
+
+#orders = driver.find_elements_by_xpath('//*[@id="js_i_detail_search_form"]/div/div')
+#run_elements = driver.find_elements_by_xpath('//descendant::td[@class = "pb05"]')
+#[x.text for x in run_elements]
+orders = driver.find_elements_by_xpath('//div[@class = "orderList"]')
+#//*[@id="js_i_detail_search_form"]/div/div[1]
+#//*[@id="js_i_detail_search_form"]/div/div[1]/div/div[2]/div/div/table/tbody/tr[2]/td[2]/table/tbody/tr[1]/td
+#//*[@id="js_i_detail_search_form"]/div/div[1]/div/div[2]/div/div/table/tbody/tr[2]/td[2]/table/tbody/tr[1]/td/a/strong/span[1]
+products = list()
+for o in orders:
+    if False:
+        o = orders[1]
+    run_elements = o.find_elements_by_xpath('.//a/strong/span')
+    #run_elements = o.find_elements_by_xpath('//table/tbody/tr/td[@class = "pb05"]')
+    #run_elements = o.find_elements_by_xpath('//table/tbody/tr/td[@class = "pb05"]')
+    products.append([x.text for x in run_elements])
+    #[x.text for x in o.find_elements_by_xpath('/descendant::strong/span')]
+
+##will delete below
 tmp = drop_downs[0]
 tmp.s
 drop_downs[0].selectByValue('全てのご注文')
@@ -31,11 +50,6 @@ category_dropdowns[0].click()
 L0_elements = category_dropdowns[0].find_elements_by_xpath("//descendant::a[@class = 'child-submenu-link']")
 L0_links = [x.get_attribute("href") for x in L0_elements]
 print('number of categories = {0}'.format(len(L0_links)))
-
-
-
-
-
 
 
 
