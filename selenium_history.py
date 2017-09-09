@@ -1,10 +1,14 @@
 from selenium import webdriver
 import chromedriver_binary
-import time
 
+import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 def get_a_element(driver, xpath, caster):
     items = driver.find_elements_by_xpath(xpath)
+
     if len(items) > 0:
         try:
             return (caster(items[0].text))
@@ -16,28 +20,58 @@ options = webdriver.ChromeOptions()
 options.add_argument(r"user-data-dir=C:\Users\t\PycharmProjects\keras_sandbox\chrome_profile")
 driver = webdriver.Chrome(chrome_options=options)
 driver.get('https://order.yodobashi.com/yc/login/index.html')
+
 driver.get('https://order.yodobashi.com/yc/orderhistory/index.html')
 #driver.find_elements_by_xpath('select[@id = "selectedPerido')
 drop_downs = driver.find_elements_by_id('selectedPeriod')
 driver.find_element_by_xpath("//select[@id='selectedPeriod']/option[text()='全てのご注文']").click()
 driver.find_elements_by_link_text('検索')[1].click()
-
-order_elements = driver.find_elements_by_xpath('//div[@class = "orderList"]')
 orders = list()
 order_headers = list()
-for o in order_elements:
-    if False:
-        o = order_elements[1]
-    run_elements = o.find_elements_by_xpath('.//a/strong/span')
-    run_element_header = o.find_elements_by_xpath('./div/div/ul/li/span') #[@class = "hznList"]')
-    order_headers.append([x.text for x in run_element_header])
-    #hznList
-    #fs12
-    orders.append([x.text for x in run_elements])
+is_go_next = True
+order_frame_xpath = '//div[@class = "orderList"]'
+while is_go_next:
+    time.sleep(5)
+
+    run_test = WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.XPATH, order_frame_xpath)))
+    #run_test.click()
+    #order_elements = driver.find_elements_by_xpath(order_frame_xpath)
+    time.sleep(5)
+    order_elements = driver.find_elements_by_xpath(order_frame_xpath)
+
+    for o in order_elements:
+        if False:
+            o = order_elements[2]
+        run_elements = o.find_elements_by_xpath('.//a/strong/span')
+        run_element_header = o.find_elements_by_xpath('./div/div/ul/li/span') #[@class = "hznList"]')
+        order_headers.append([x.text for x in run_element_header])
+        #hznList
+        #fs12
+        orders.append([x.text for x in run_elements])
+
+    next_elements = driver.find_elements_by_link_text('次のページ')
+    if len(next_elements) > 0:
+        to_click = WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.LINK_TEXT, '次のページ')))
+        to_click.click()
+        #next_elements[0].click()
+    else:
+        is_go_next = False
+
+driver.close()
+import pickle
+
+with open('data/orders.pkl', 'wb') as f:
+    pickle.dump(orders, f)
+
+with open('data/order_headers.pkl', 'wb') as f:
+    pickle.dump(order_headers, f)
+
+
 
 
 ##will delete below
 tmp = drop_downs[0]
+
 tmp.s
 drop_downs[0].selectByValue('全てのご注文')
 #driver.find_elements_by_link_text('カテゴリ')
