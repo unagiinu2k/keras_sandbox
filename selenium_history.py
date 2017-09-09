@@ -22,22 +22,19 @@ drop_downs = driver.find_elements_by_id('selectedPeriod')
 driver.find_element_by_xpath("//select[@id='selectedPeriod']/option[text()='全てのご注文']").click()
 driver.find_elements_by_link_text('検索')[1].click()
 
-#orders = driver.find_elements_by_xpath('//*[@id="js_i_detail_search_form"]/div/div')
-#run_elements = driver.find_elements_by_xpath('//descendant::td[@class = "pb05"]')
-#[x.text for x in run_elements]
-orders = driver.find_elements_by_xpath('//div[@class = "orderList"]')
-#//*[@id="js_i_detail_search_form"]/div/div[1]
-#//*[@id="js_i_detail_search_form"]/div/div[1]/div/div[2]/div/div/table/tbody/tr[2]/td[2]/table/tbody/tr[1]/td
-#//*[@id="js_i_detail_search_form"]/div/div[1]/div/div[2]/div/div/table/tbody/tr[2]/td[2]/table/tbody/tr[1]/td/a/strong/span[1]
-products = list()
-for o in orders:
+order_elements = driver.find_elements_by_xpath('//div[@class = "orderList"]')
+orders = list()
+order_headers = list()
+for o in order_elements:
     if False:
-        o = orders[1]
+        o = order_elements[1]
     run_elements = o.find_elements_by_xpath('.//a/strong/span')
-    #run_elements = o.find_elements_by_xpath('//table/tbody/tr/td[@class = "pb05"]')
-    #run_elements = o.find_elements_by_xpath('//table/tbody/tr/td[@class = "pb05"]')
-    products.append([x.text for x in run_elements])
-    #[x.text for x in o.find_elements_by_xpath('/descendant::strong/span')]
+    run_element_header = o.find_elements_by_xpath('./div/div/ul/li/span') #[@class = "hznList"]')
+    order_headers.append([x.text for x in run_element_header])
+    #hznList
+    #fs12
+    orders.append([x.text for x in run_elements])
+
 
 ##will delete below
 tmp = drop_downs[0]
