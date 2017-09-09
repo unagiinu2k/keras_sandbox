@@ -56,8 +56,6 @@ while is_go_next:
         #next_elements[0].click()
     else:
         is_go_next = False
-
-driver.close()
 import pickle
 
 with open('data/orders.pkl', 'wb') as f:
@@ -65,9 +63,42 @@ with open('data/orders.pkl', 'wb') as f:
 
 with open('data/order_headers.pkl', 'wb') as f:
     pickle.dump(order_headers, f)
+#from selenium.webdriver.common.keys import Keys
 
 
+url = list()
+for h in order_headers:
+    if False:
+        h = order_headers[13]
 
+    driver.get('https://order.yodobashi.com/yc/login/index.html')
+    time.sleep(5)
+    run_input_fields = driver.find_elements_by_id("orderNo")
+    run_input_fields[0].send_keys(h[1])
+    driver.find_elements_by_link_text('検索')[0].click()
+    #run_input_fields[0].send_keys(Keys.ENTER)
+    item_list_elements = driver.find_elements_by_xpath('//div[@class = "cartItemList"]')#//*[@id="contents"]/div[4]/div/div[2]/div/div
+    order_detail_elements = item_list_elements[0].find_elements_by_xpath('.//div[contains(@class , "orderDetailBlock")]')
+
+    for o in order_detail_elements:
+        run_product = dict()
+        if False:
+            o = order_detail_elements[0]
+        run_url = o.find_elements_by_xpath('.//div/table/tbody/tr/td/table/tbody/tr/td/p/a')[0].get_attribute('href')
+        run_product['url'] = run_url
+        run_unit_price = o.find_elements_by_xpath('.//td[@class = "ecPriceArea"]')[0].text
+
+
+        run_product['unit_price'] = run_unit_pricerun_unit_price = o.find_elements_by_xpath('.//td[@class = "ecPriceArea"]')[0].text
+
+        run_quantity = o.find_elements_by_xpath('.//td[@class = "ecQuantityArea"]')[0].text
+        run_product['quantity'] = run_quantity
+
+    o.find_elements_by_link_text('_')
+#//*[@id="contents"]/div[4]/div/div[2]/div/div/div[1]/div[1]/table/tbody/tr[1]/td[2]/table/tbody/tr/td[1]/p/a
+#//*[@id="contents"]/div[4]/div/div[2]/div/div/div[1]
+#//*[@id="contents"]/div[4]/div/div[2]/div/div/div[1]/div[1]/table/tbody/tr[1]/td[2]/table/tbody/tr/td[2]/p
+driver.close()
 
 ##will delete below
 tmp = drop_downs[0]
