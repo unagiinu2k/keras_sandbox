@@ -66,7 +66,7 @@ with open('data/order_headers.pkl', 'wb') as f:
 #from selenium.webdriver.common.keys import Keys
 
 
-url = list()
+order_detail_list = list()
 for h in order_headers:
     if False:
         h = order_headers[13]
@@ -87,17 +87,18 @@ for h in order_headers:
         run_url = o.find_elements_by_xpath('.//div/table/tbody/tr/td/table/tbody/tr/td/p/a')[0].get_attribute('href')
         run_product['url'] = run_url
         run_unit_price = o.find_elements_by_xpath('.//td[@class = "ecPriceArea"]')[0].text
-
-
         run_product['unit_price'] = run_unit_pricerun_unit_price = o.find_elements_by_xpath('.//td[@class = "ecPriceArea"]')[0].text
 
         run_quantity = o.find_elements_by_xpath('.//td[@class = "ecQuantityArea"]')[0].text
         run_product['quantity'] = run_quantity
+        run_product['date'] = h[0]
+        run_product['order_no'] = h[1]
+        run_product['delivery_status'] = h[2]
+        order_detail_list.append(run_product)
 
-    o.find_elements_by_link_text('_')
-#//*[@id="contents"]/div[4]/div/div[2]/div/div/div[1]/div[1]/table/tbody/tr[1]/td[2]/table/tbody/tr/td[1]/p/a
-#//*[@id="contents"]/div[4]/div/div[2]/div/div/div[1]
-#//*[@id="contents"]/div[4]/div/div[2]/div/div/div[1]/div[1]/table/tbody/tr[1]/td[2]/table/tbody/tr/td[2]/p
+with open('data/order_details.pkl', 'wb') as f:
+    pickle.dump(order_detail_list, f)
+
 driver.close()
 
 ##will delete below
