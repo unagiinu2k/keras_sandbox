@@ -76,6 +76,7 @@ for h in order_headers:
     run_input_fields = driver.find_elements_by_id("orderNo")
     run_input_fields[0].send_keys(h[1])
     driver.find_elements_by_link_text('検索')[0].click()
+    time.sleep(5)
     #run_input_fields[0].send_keys(Keys.ENTER)
     item_list_elements = driver.find_elements_by_xpath('//div[@class = "cartItemList"]')#//*[@id="contents"]/div[4]/div/div[2]/div/div
     order_detail_elements = item_list_elements[0].find_elements_by_xpath('.//div[contains(@class , "orderDetailBlock")]')
@@ -85,6 +86,9 @@ for h in order_headers:
         if False:
             o = order_detail_elements[0]
         run_url = o.find_elements_by_xpath('.//div/table/tbody/tr/td/table/tbody/tr/td/p/a')[0].get_attribute('href')
+        product_link_text_elements = o.find_elements_by_xpath('.//div/table/tbody/tr/td/table/tbody/tr/td/p/a/strong/span')
+        run_product['link_text'] = [x.text for x in product_link_text_elements]
+        #//*[@id="contents"]/div[4]/div/div[2]/div/div/div/div/table/tbody/tr[1]/td[2]/table/tbody/tr/td[1]/p/a/strong/span[4]
         run_product['url'] = run_url
         run_unit_price = o.find_elements_by_xpath('.//td[@class = "ecPriceArea"]')[0].text
         run_product['unit_price'] = run_unit_pricerun_unit_price = o.find_elements_by_xpath('.//td[@class = "ecPriceArea"]')[0].text
@@ -101,88 +105,37 @@ with open('data/order_details.pkl', 'wb') as f:
 
 driver.close()
 
-##will delete below
-tmp = drop_downs[0]
+makers = list()
+unit_prices = list()
+quantities = list()
+urls = list()
+product_names = list()
+for i in order_detail_list:
 
-tmp.s
-drop_downs[0].selectByValue('全てのご注文')
-#driver.find_elements_by_link_text('カテゴリ')
-#driver.find_elements_by_xpath("//div[@class = 'action-bar-dropdown']")
-category_dropdowns = driver.find_elements_by_xpath("//button[@aria-controls = 'action-dropdown-children-カテゴリ']")
-category_dropdowns[0].click()
-L0_elements = category_dropdowns[0].find_elements_by_xpath("//descendant::a[@class = 'child-submenu-link']")
-L0_links = [x.get_attribute("href") for x in L0_elements]
-print('number of categories = {0}'.format(len(L0_links)))
-
-
-
-for i0 , s0 in enumerate(L0_elements):
     if False:
-        i0 = 1
-        s0 = L0_elements[1]
-    s0.click()
-    L1_elements = driver.find_elements_by_link_text('もっと見る')
-    for i1 , s1 in enumerate(L1_elements):
-        if False:
-            i1 = 1
-            s1 = L1_elements[1]
-        s1.click()
-        #L2_elements = driver.find_elements_by_link_text('もっと見る')
-        is_continue = True
-        while is_continue:
-            show_mores = driver.find_elements_by_xpath("//button[@id ='show-more-button']")
-            if len(show_mores) == 0:
-                is_continue = False
-            else:
-                time.sleep(5)
-                show_mores[0].click()
-            if False:
-                scores = driver.find_elements_by_xpath("//div[@class = 'score']")
-                score = None
-                if len(scores) > 0:
-                    try:
-                        score = float(scores[0].text)
-                    except:
-                        pass
+        i = order_detail_list[0]
+    i['date']
+    run_unit_price = i['unit_price']
+    if run_unit_price != "":
+        makers.append(i['link_text'][0])
+        product_names.append(i['link_text'][3])
+        unit_prices.append(int(i['unit_price'][1:].replace(",","")))
+        quantities.append(int(i['quantity']))
+        urls.append(i['url'])
 
-                review_ns = driver.find_elements_by_xpath("//span[@class = 'reviews-num']")
-                review_n = None
-                if len(review_ns) > 0:
-                    try:
-                        review_n = int(review_ns[0].text.replace(',',''))
-                    except:
-                        pass
-                date_updates = driver.find_elements_by_xpath("//div[@itemprop = 'datePublished']")
-                date_update = None
-                if len(date_updates) > 0:
-                    try:
-                        date_updte = date_updates[0].text
-                    except:
-                        pass
-                def get_a_element(driver , xpath , caster):
-                    items = driver.find_elements_by_xpath(xpath)
-                    if len(items) > 0:
-                        try:
-                            return(caster(items[0].text))
-                        except:
-                            return(None)
-                    return(None)
+import pandas as pd
+order_detail_df = pd.DataFrame(dict(maker = makers , unit_price = unit_prices , quantity = quantities , url = urls , product_name = product_names))
+order_detail_df.to_pickle('data/order_details_df.pkl')
+from collections import Counter
+Counter(order_detail_df.maker).most_common()
 
-
-            # get rating, maker name, maker url, review count etc.. for each product
-            score = get_a_element(driver, "//div[@class = 'score']" , lambda x:float(x))
-            reviews_num = get_a_element(driver , "//span[@class = 'reviews-num']" , lambda x:int(x.replace(',' , '')))
-            datePublished = get_a_element(driver, "//div[@itemprop = 'datePublished']" ,lambda x:x)
-            numDownloads = get_a_element(driver, "//div[@itemprop = 'numDownloads']", lambda x: x)
-            contentRating = get_a_element(driver, "//div[@itemprop = 'contentRating']", lambda x: x)
-            driver.find_elements_by_link_text('提供元')
-            meta_infos = driver.find_elements_by_xpath("//div[contains(@class , 'meta-info')]")
-
-            meta_info_list = [x.text for x in meta_infos]
-
-
-
-
-
-
-driver.close()
+order_detail_df['payment'] = order_detail_df.quantity * order_detail_df.unit_price
+order_detail_df.groupby('maker').agg({'payment':'sum'}).sort_values('payment')
+makers = list()
+product_names = list()
+for o in orders:
+    if False:
+        o = orders[3]
+    for j in range(int(len(o) / 4)):
+        makers.append(o[j * 4])
+        product_names.append(o[j * 4 + 3])
