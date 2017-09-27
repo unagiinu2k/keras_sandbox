@@ -392,7 +392,7 @@ environment.set('musicxmlPath' , r"C:\Program Files (x86)\Finale NotePad 2012\Fi
 def __parse_midi(data_fn):
     # Parse the MIDI data for separate melody and accompaniment parts.
     midi_data = converter.parse(data_fn)
-    if False:
+if False:
         midi_data.show()
         melody_stream.show()
         melody1.show()

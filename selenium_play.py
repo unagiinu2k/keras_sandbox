@@ -92,7 +92,7 @@ for i0 , s0 in enumerate(L0_elements):
             driver.find_elements_by_link_text('提供元')
             meta_infos = driver.find_elements_by_xpath("//div[contains(@class , 'meta-info')]")
 
-            [x.text for x in meta_infos]
+            meta_info_list = [x.text for x in meta_infos]
 
 
 
