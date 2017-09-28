@@ -1,3 +1,5 @@
+#もはやこのファイルには意味がない。別のプロジェクトに移行したのでそちらをみるべし！！！！
+'''
 '''
 Author:     Ji-Sung Kim
 Project:    deepjazz
